@@ -147,7 +147,7 @@ def expand_db_url(db_url: str, testing: bool = False) -> dict:
         path = url.netloc + url.path
 
     if not path:
-        if db_backend == "sqlite":
+        if db_backend in {"sqlite", "asqlite", "aiosqlite"}:
             raise ConfigurationError("No path specified for DB_URL")
         # Other database backend accepts database name being None (but not empty string).
         path = None
