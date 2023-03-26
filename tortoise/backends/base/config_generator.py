@@ -9,6 +9,8 @@ urlparse.uses_netloc.append("postgres")
 urlparse.uses_netloc.append("asyncpg")
 urlparse.uses_netloc.append("psycopg")
 urlparse.uses_netloc.append("sqlite")
+urlparse.uses_netloc.append("asqlite")
+urlparse.uses_netloc.append("aiosqlite")
 urlparse.uses_netloc.append("mysql")
 urlparse.uses_netloc.append("oracle")
 urlparse.uses_netloc.append("mssql")
@@ -57,8 +59,15 @@ DB_LOOKUP: Dict[str, Dict[str, Any]] = {
             "ssl": bool,
         },
     },
-    "sqlite": {
-        "engine": "tortoise.backends.sqlite",
+    "aiosqlite": {
+        "engine": "tortoise.backends.aiosqlite",
+        "skip_first_char": False,
+        "vmap": {"path": "file_path"},
+        "defaults": {"journal_mode": "WAL", "journal_size_limit": 16384},
+        "cast": {"journal_size_limit": int},
+    },
+    "asqlite": {
+        "engine": "tortoise.backends.asqlite",
         "skip_first_char": False,
         "vmap": {"path": "file_path"},
         "defaults": {"journal_mode": "WAL", "journal_size_limit": 16384},
@@ -122,6 +131,7 @@ DB_LOOKUP: Dict[str, Dict[str, Any]] = {
 }
 # Create an alias for backwards compatibility
 DB_LOOKUP["postgres"] = DB_LOOKUP["asyncpg"]
+DB_LOOKUP["sqlite"] = DB_LOOKUP["asqlite"]
 
 
 def expand_db_url(db_url: str, testing: bool = False) -> dict:

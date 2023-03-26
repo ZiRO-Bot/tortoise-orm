@@ -34,10 +34,10 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 pypika-tortoise = "^0.1.6"
 iso8601 = "^1.0.2"
-aiosqlite = ">=0.16.0, <0.18.0"
+asqlite = { git = "https://github.com/Rapptz/asqlite", rev = "ed54062e35acb5d0fe73bf536fc9dd6f22886950" }
 pytz = "*"
 ciso8601 = { version = "*", markers = "sys_platform != 'win32' and implementation_name == 'cpython'", optional = true }
 uvloop = { version = "*", markers = "sys_platform != 'win32' and implementation_name == 'cpython'", optional = true }
@@ -47,6 +47,7 @@ aiomysql = { version = "*", optional = true }
 asyncmy = { version = "^0.2.5", optional = true }
 psycopg = { extras = ["pool", "binary"], version = "3.0.12", optional = true }
 asyncodbc = { version = "^0.1.1", optional = true }
+aiosqlite = { version = ">=0.16.0, <0.18.0", optional = true }
 
 [tool.poetry.dev-dependencies]
 # Linter tools
