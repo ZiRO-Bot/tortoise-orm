@@ -50,7 +50,7 @@ class SqliteClient(BaseDBAsyncClient):
         "sqlite", daemon=False, requires_limit=True, inline_comment=True, support_for_update=False
     )
     _pool: Optional[asqlite.Pool] = None
-    _connection: asqlite.Connection
+    _connection: Optional[asqlite.Connection] = None
 
     def __init__(self, file_path: str, **kwargs: Any) -> None:
         super().__init__(**kwargs)
@@ -153,7 +153,7 @@ class TransactionWrapper(SqliteClient, BaseTransactionWrapper):
         self._trxlock = asyncio.Lock()
         self.log = connection.log
         self.connection_name = connection.connection_name
-        self.transaction: asqlite.Transaction = None  # type: ignore
+        self.transaction: asqlite.Transaction = None
         self._finalized = False
         self.fetch_inserted = connection.fetch_inserted
         self._parent: SqliteClient = connection
