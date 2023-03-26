@@ -126,7 +126,7 @@ class SqliteClient(BaseDBAsyncClient):
         async with self.acquire_connection() as connection:
             self.log.debug("%s: %s", query, values)
             start = connection.total_changes
-            cursor: asqlite.Cursor =  await connection.execute(query, values)
+            cursor: asqlite.Cursor = await connection.execute(query, values)
             rows = await cursor.fetchall()
             return (connection.total_changes - start) or len(rows), rows
 
@@ -135,7 +135,7 @@ class SqliteClient(BaseDBAsyncClient):
         query = query.replace("\x00", "'||CHAR(0)||'")
         async with self.acquire_connection() as connection:
             self.log.debug("%s: %s", query, values)
-            cursor: asqlite.Cursor =  await connection.execute(query, values)
+            cursor: asqlite.Cursor = await connection.execute(query, values)
             rows = await cursor.fetchall()
             return list(map(dict, rows))
 
