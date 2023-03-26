@@ -15,8 +15,8 @@ from tortoise.backends.base.client import (
     NestedTransactionContext,
     TransactionContext,
 )
-from tortoise.backends.sqlite.executor import SqliteExecutor
-from tortoise.backends.sqlite.schema_generator import SqliteSchemaGenerator
+from tortoise.backends.aiosqlite.executor import SqliteExecutor
+from tortoise.backends.aiosqlite.schema_generator import SqliteSchemaGenerator
 from tortoise.exceptions import (
     IntegrityError,
     OperationalError,
