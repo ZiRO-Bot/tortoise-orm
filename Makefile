@@ -18,7 +18,7 @@ up:
 	@poetry update
 
 deps:
-	@poetry install -E asyncpg -E aiomysql -E asyncmy -E accel -E psycopg -E asyncodbc
+	@poetry install -E asyncpg -E aiomysql -E asyncmy -E accel -E psycopg -E asyncodbc -E aiosqlite
 
 check: deps build
 ifneq ($(shell which black),)

@@ -94,6 +94,7 @@ docutils = "*"
 
 [tool.poetry.extras]
 accel = ["ciso8601", "uvloop", "orjson"]
+aiosqlite = ["aiosqlite"]
 asyncpg = ["asyncpg"]
 psycopg = ["psycopg"]
 aiomysql = ["aiomysql"]

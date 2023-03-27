@@ -9,7 +9,8 @@ from tortoise.backends.mssql import MSSQLClient
 from tortoise.backends.mysql import MySQLClient
 from tortoise.backends.oracle import OracleClient
 from tortoise.backends.psycopg import PsycopgClient
-from tortoise.backends.sqlite import SqliteClient
+from tortoise.backends.asqlite import AsqliteClient
+from tortoise.backends.aiosqlite import AiosqliteClient
 from tortoise.contrib import test
 
 
@@ -21,7 +22,7 @@ class TestDefault(test.TestCase):
             await db.execute_query(
                 "insert into defaultmodel (`int_default`,`float_default`,`decimal_default`,`bool_default`,`char_default`,`date_default`,`datetime_default`) values (DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT)",
             )
-        elif isinstance(db, SqliteClient):
+        elif isinstance(db, (AsqliteClient, AiosqliteClient)):
             await db.execute_query(
                 "insert into defaultmodel default values",
             )

@@ -1,3 +1,3 @@
-from .client import SqliteClient
+from .client import AiosqliteClient
 
-client_class = SqliteClient
+client_class = AiosqliteClient

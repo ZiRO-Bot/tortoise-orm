@@ -40,7 +40,7 @@ def translate_exceptions(func: F) -> F:
     return translate_exceptions_  # type: ignore
 
 
-class SqliteClient(BaseDBAsyncClient):
+class AiosqliteClient(BaseDBAsyncClient):
     executor_class = SqliteExecutor
     query_class = SQLLiteQuery
     schema_generator = SqliteSchemaGenerator
@@ -155,8 +155,8 @@ class SqliteClient(BaseDBAsyncClient):
             await connection.executescript(query)
 
 
-class TransactionWrapper(SqliteClient, BaseTransactionWrapper):
-    def __init__(self, connection: SqliteClient) -> None:
+class TransactionWrapper(AiosqliteClient, BaseTransactionWrapper):
+    def __init__(self, connection: AiosqliteClient) -> None:
         self.connection_name = connection.connection_name
         self._connection: aiosqlite.Connection = connection._connection  # type: ignore
         self._lock = asyncio.Lock()

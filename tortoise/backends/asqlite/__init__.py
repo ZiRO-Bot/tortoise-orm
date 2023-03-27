@@ -1,3 +1,3 @@
-from .client import SqliteClient
+from .client import AsqliteClient
 
-client_class = SqliteClient
+client_class = AsqliteClient

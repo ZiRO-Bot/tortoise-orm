@@ -42,7 +42,7 @@ def translate_exceptions(func: F) -> F:
     return translate_exceptions_  # type: ignore
 
 
-class SqliteClient(BaseDBAsyncClient):
+class AsqliteClient(BaseDBAsyncClient):
     executor_class = SqliteExecutor
     query_class = SQLLiteQuery
     schema_generator = SqliteSchemaGenerator
@@ -146,8 +146,8 @@ class SqliteClient(BaseDBAsyncClient):
             await connection.executescript(query)
 
 
-class TransactionWrapper(SqliteClient, BaseTransactionWrapper):
-    def __init__(self, connection: SqliteClient) -> None:
+class TransactionWrapper(AsqliteClient, BaseTransactionWrapper):
+    def __init__(self, connection: AsqliteClient) -> None:
         self._connection: asqlite.Connection = connection._connection
         self._lock = asyncio.Lock()
         self._trxlock = asyncio.Lock()
@@ -156,7 +156,7 @@ class TransactionWrapper(SqliteClient, BaseTransactionWrapper):
         self.transaction: asqlite.Transaction = None
         self._finalized = False
         self.fetch_inserted = connection.fetch_inserted
-        self._parent: SqliteClient = connection
+        self._parent: AsqliteClient = connection
 
     def _in_transaction(self) -> "TransactionContext":
         return NestedTransactionPooledContext(self)
