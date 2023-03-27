@@ -57,8 +57,7 @@ class AsqliteClient(BaseDBAsyncClient):
         self.filename = file_path
 
     async def create_connection(self, with_db: bool) -> None:
-        if not self._pool:
-            self._pool = await self.create_pool()
+        self._pool = await self.create_pool()
 
     async def create_pool(self, **kwargs) -> asqlite.Pool:
         return await asqlite.create_pool(self.filename, **kwargs)
@@ -93,30 +92,31 @@ class AsqliteClient(BaseDBAsyncClient):
     def acquire_connection(self) -> Union[PoolConnectionWrapper, ConnectionWrapper]:
         return PoolConnectionWrapper(self)
 
-    def _in_transaction(self) -> "TransactionContext":
+    def _in_transaction(self) -> TransactionContext:
         return TransactionContextPooled(TransactionWrapper(self))
 
     @translate_exceptions
     async def execute_insert(self, query: str, values: list) -> int:
         async with self.acquire_connection() as connection:
             self.log.debug("%s: %s", query, values)
-            cursor: asqlite.Cursor = await connection.execute(query, values)
-            await cursor.execute("SELECT last_insert_rowid()")
-            return (await cursor.fetchone())[0]
+            _cursor = await connection.execute(query, *values)
+            await _cursor.execute("SELECT last_insert_rowid()")
+            return (await _cursor.fetchone())[0]
 
     @translate_exceptions
     async def execute_many(self, query: str, values: List[list]) -> None:
         async with self.acquire_connection() as connection:
             self.log.debug("%s: %s", query, values)
             # This code is only ever called in AUTOCOMMIT mode
-            await connection.execute("BEGIN")
+            transaction: asqlite.Transaction = connection.transaction()
+            await transaction.start()
             try:
                 await connection.executemany(query, values)
             except Exception:
-                await connection.rollback()
+                await transaction.rollback()
                 raise
             else:
-                await connection.commit()
+                await transaction.commit()
 
     @translate_exceptions
     async def execute_query(
@@ -125,19 +125,22 @@ class AsqliteClient(BaseDBAsyncClient):
         query = query.replace("\x00", "'||CHAR(0)||'")
         async with self.acquire_connection() as connection:
             self.log.debug("%s: %s", query, values)
-            start = connection.total_changes
-            cursor: asqlite.Cursor = await connection.execute(query, values)
-            rows = await cursor.fetchall()
-            return (connection.total_changes - start) or len(rows), rows
+            start = connection.get_connection().total_changes
+            if values:
+                params = [query, *values]
+            else:
+                params = [query]
+            rows = await connection.fetchall(*params)
+            return (connection.get_connection().total_changes - start) or len(rows), rows
 
     @translate_exceptions
     async def execute_query_dict(self, query: str, values: Optional[list] = None) -> List[dict]:
         query = query.replace("\x00", "'||CHAR(0)||'")
         async with self.acquire_connection() as connection:
             self.log.debug("%s: %s", query, values)
-            cursor: asqlite.Cursor = await connection.execute(query, values)
-            rows = await cursor.fetchall()
-            return list(map(dict, rows))
+            if values:
+                return list(map(dict, await connection.fetchall(query, *values)))
+            return list(map(dict, await connection.fetchall(query)))
 
     @translate_exceptions
     async def execute_script(self, query: str) -> None:
@@ -171,7 +174,6 @@ class TransactionWrapper(AsqliteClient, BaseTransactionWrapper):
             # Already within transaction, so ideal for performance
             await connection.executemany(query, values)
 
-    @translate_exceptions
     async def start(self) -> None:
         self.transaction = self._connection.transaction()
         await self.transaction.start()
