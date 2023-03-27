@@ -70,8 +70,8 @@ DB_LOOKUP: Dict[str, Dict[str, Any]] = {
         "engine": "tortoise.backends.asqlite",
         "skip_first_char": False,
         "vmap": {"path": "file_path"},
-        "defaults": {"journal_mode": "WAL", "journal_size_limit": 16384},
-        "cast": {"journal_size_limit": int},
+        "defaults": {},
+        "cast": {},
     },
     "mysql": {
         "engine": "tortoise.backends.mysql",

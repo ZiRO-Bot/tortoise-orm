@@ -146,7 +146,8 @@ class AsqliteClient(BaseDBAsyncClient):
     async def execute_script(self, query: str) -> None:
         async with self.acquire_connection() as connection:
             self.log.debug(query)
-            await connection.executescript(query)
+            async with connection.cursor(transaction=True) as cursor:
+                await cursor.executescript(query)
 
 
 class TransactionWrapper(AsqliteClient, BaseTransactionWrapper):

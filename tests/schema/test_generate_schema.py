@@ -29,13 +29,13 @@ class TestGenerateSchema(test.SimpleTestCase):
 
     async def init_for(self, module: str, safe=False) -> None:
         with patch(
-            "tortoise.backends.sqlite.client.SqliteClient.create_connection", new=MagicMock()
+            "asqlite.create_pool", new=MagicMock()
         ):
             await Tortoise.init(
                 {
                     "connections": {
                         "default": {
-                            "engine": "tortoise.backends.sqlite",
+                            "engine": "tortoise.backends.asqlite",
                             "credentials": {"file_path": ":memory:"},
                         }
                     },
