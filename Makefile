@@ -42,10 +42,13 @@ endif
 	twine check dist/*
 
 test: deps
-	$(py_warn) TORTOISE_TEST_DB=sqlite://:memory: pytest $(pytest_opts)
+	$(py_warn) TORTOISE_TEST_DB=asqlite://:memory: pytest $(pytest_opts)
 
-test_sqlite:
-	$(py_warn) TORTOISE_TEST_DB=sqlite://:memory: pytest --cov-report= $(pytest_opts)
+test_sqlite_asqlite:
+	$(py_warn) TORTOISE_TEST_DB=asqlite://:memory: pytest --cov-report= $(pytest_opts)
+
+test_sqlite_aiosqlite:
+	$(py_warn) TORTOISE_TEST_DB=aiosqlite://:memory: pytest --cov-report= $(pytest_opts)
 
 test_postgres_asyncpg:
 	python -V | grep PyPy || $(py_warn) TORTOISE_TEST_DB="asyncpg://postgres:$(TORTOISE_POSTGRES_PASS)@127.0.0.1:5432/test_\{\}" pytest $(pytest_opts) --cov-append --cov-report=
@@ -65,7 +68,7 @@ test_mssql:
 test_oracle:
 	$(py_warn) TORTOISE_TEST_DB="oracle://SYSTEM:$(TORTOISE_ORACLE_PASS)@127.0.0.1:1521/test_\{\}?driver=$(TORTOISE_ORACLE_DRIVER)" pytest $(pytest_opts) --cov-append --cov-report=
 
-_testall: test_sqlite test_postgres_asyncpg test_postgres_psycopg test_mysql_myisam test_mysql test_mssql
+_testall: test_sqlite_asqlite test_sqlite_aiosqlite test_postgres_asyncpg test_postgres_psycopg test_mysql_myisam test_mysql test_mssql
 
 testall: deps _testall
 	coverage report
